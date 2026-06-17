@@ -1,1 +1,13 @@
-{"id":"keepalive","name":"后台保活","version":"2.0.0","description":"后台保活：APK原生前台Service优先，无APK时自动降级为Web静默音频。","author":"Roche Community","entry":"https://raw.githubusercontent.com/luyi90720-sys/keepalive/main/plugin.js","hash":"","permissions":["storage","ui"]}
+{
+  "id": "keepalive",
+  "name": "后台保活",
+  "version": "2.2.0",
+  "description": "后台保活：APK原生前台Service（内置静默音频）优先，无APK时自动降级为Web静默音频。",
+  "author": "Roche Community",
+  "entry": "https://raw.githubusercontent.com/luyi90720-sys/keepalive/main/plugin.js",
+  "hash": "",
+  "permissions": [
+    "storage",
+    "ui"
+  ]
+}
