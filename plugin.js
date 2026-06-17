@@ -31,6 +31,10 @@
   async function startNativeKeepAlive() {
     if (!hasNativeAudio()) return false;
     try {
+      if (window.nativeAudioBridge.startKeepAlive) {
+        await window.nativeAudioBridge.startKeepAlive();
+        return true;
+      }
       await window.nativeAudioBridge.replaceQueue([{
         id: 'keepalive',
         title: 'Roche保活',
