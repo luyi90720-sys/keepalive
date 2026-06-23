@@ -1,1 +1,13 @@
-ewogICJpZCI6ICJrZWVwYWxpdmUiLAogICJuYW1lIjogIktlZXAgQWxpdmUiLAogICJ2ZXJzaW9uIjogIjIuNS4wIiwKICAiZGVzY3JpcHRpb24iOiAiQmFja2dyb3VuZCBrZWVwLWFsaXZlIHBsdWdpbiBmb3IgUm9jaGUuIE5hdGl2ZSBmb3JlZ3JvdW5kIHNlcnZpY2Ugd2hlbiBBUEsgYXZhaWxhYmxlLCBXZWIgQXVkaW8gZmFsbGJhY2suIiwKICAiYXV0aG9yIjogIlJvY2hlIENvbW11bml0eSIsCiAgImVudHJ5IjogInBsdWdpbi5qcyIsCiAgImhhc2giOiAiIiwKICAicGVybWlzc2lvbnMiOiBbCiAgICAic3RvcmFnZSIsCiAgICAidWkiCiAgXQp9Cg==
+{
+  "id": "keepalive",
+  "name": "Keep Alive",
+  "version": "2.5.0",
+  "description": "Background keep-alive plugin for Roche. Native foreground service when APK available, Web Audio fallback.",
+  "author": "Roche Community",
+  "entry": "plugin.js",
+  "hash": "",
+  "permissions": [
+    "storage",
+    "ui"
+  ]
+}
