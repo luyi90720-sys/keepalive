@@ -1,13 +1,1 @@
-{
-  "id": "keepalive",
-  "name": "鍚庡彴淇濇椿",
-  "version": "2.3.0",
-  "description": "鍚庡彴淇濇椿锛欰PK鍘熺敓鍓嶅彴Service锛堝唴缃潤榛橀煶棰戯級浼樺厛锛屾棤APK鏃惰嚜鍔ㄩ檷绾т负Web闈欓粯闊抽銆?,
-  "author": "Roche Community",
-  "entry": "plugin.js",
-  "hash": "",
-  "permissions": [
-    "storage",
-    "ui"
-  ]
-}
+ewogICJpZCI6ICJrZWVwYWxpdmUiLAogICJuYW1lIjogIktlZXAgQWxpdmUiLAogICJ2ZXJzaW9uIjogIjIuNC4wIiwKICAiZGVzY3JpcHRpb24iOiAiQmFja2dyb3VuZCBrZWVwLWFsaXZlIHBsdWdpbiBmb3IgUm9jaGUuIFVzZXMgbmF0aXZlIGZvcmVncm91bmQgc2VydmljZSB3aGVuIEFQSyBpcyBhdmFpbGFibGUsIGZhbGxzIGJhY2sgdG8gc2lsZW50IFdlYiBBdWRpbyBsb29wIG90aGVyd2lzZS4iLAogICJhdXRob3IiOiAiUm9jaGUgQ29tbXVuaXR5IiwKICAiZW50cnkiOiAicGx1Z2luLmpzIiwKICAiaGFzaCI6ICIiLAogICJwZXJtaXNzaW9ucyI6IFsKICAgICJzdG9yYWdlIiwKICAgICJ1aSIKICBdCn0K
