@@ -1,10 +1,10 @@
 {
   "id": "keepalive",
-  "name": "后台保活",
-  "version": "2.2.0",
-  "description": "后台保活：APK原生前台Service（内置静默音频）优先，无APK时自动降级为Web静默音频。",
+  "name": "鍚庡彴淇濇椿",
+  "version": "2.3.0",
+  "description": "鍚庡彴淇濇椿锛欰PK鍘熺敓鍓嶅彴Service锛堝唴缃潤榛橀煶棰戯級浼樺厛锛屾棤APK鏃惰嚜鍔ㄩ檷绾т负Web闈欓粯闊抽銆?,
   "author": "Roche Community",
-  "entry": "https://raw.githubusercontent.com/luyi90720-sys/keepalive/main/plugin.js",
+  "entry": "plugin.js",
   "hash": "",
   "permissions": [
     "storage",
