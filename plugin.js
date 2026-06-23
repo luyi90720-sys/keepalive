@@ -1,8 +1,10 @@
 /**
  * ============================================================
- *  Roche Keep Alive Plugin v2.5.0
+ *  Roche Keep Alive Plugin v2.6.0
  *
- *  Primary: Native foreground service via nativeAudioBridge (APK)
+ *  Tier 1: Native startKeepAlive() - APK built-in 20s silence
+ *  Tier 2: replaceQueue android.resource - built-in 20s
+ *  Tier 3: replaceQueue remote silence - 1s fallback
  *  Fallback: Silent Web Audio loop (web / no APK)
  * ============================================================
  */
@@ -24,16 +26,26 @@
     return !!(window.AudioContext || window.webkitAudioContext);
   }
 
-  // ========== Native Audio Bridge (APK primary) ==========
+  // ========== Native Audio Bridge (APK) ==========
+
+  var REMOTE_SILENCE_URL = 'https://cdn.jsdelivr.net/gh/luyi90720-sys/keepalive@main/silence.wav';
 
   async function startNativeKeepAlive() {
     if (!hasNativeAudio()) return false;
+
+    // Tier 1: APK built-in 20s silence (no VPN needed, most reliable)
     try {
       if (typeof window.nativeAudioBridge.startKeepAlive === 'function') {
         await window.nativeAudioBridge.startKeepAlive();
+        console.log('[KeepAlive] Native startKeepAlive OK (built-in 20s)');
         return true;
       }
-      // fallback to legacy queue API
+    } catch (e) {
+      console.warn('[KeepAlive] startKeepAlive() failed:', e);
+    }
+
+    // Tier 2: replaceQueue with built-in android.resource (20s)
+    try {
       await window.nativeAudioBridge.replaceQueue([{
         id: 'keepalive',
         title: 'Roche Keep Alive',
@@ -41,11 +53,28 @@
         cover: '',
         url: 'android.resource://com.roche.app/raw/silence'
       }], 0, 'loop', true);
+      console.log('[KeepAlive] replaceQueue built-in OK (20s)');
       return true;
     } catch (e) {
-      console.warn('[KeepAlive] native start failed:', e);
-      return false;
+      console.warn('[KeepAlive] replaceQueue built-in failed:', e);
     }
+
+    // Tier 3: replaceQueue with remote silence (1s, needs VPN)
+    try {
+      await window.nativeAudioBridge.replaceQueue([{
+        id: 'keepalive',
+        title: 'Roche Keep Alive',
+        artist: '',
+        cover: '',
+        url: REMOTE_SILENCE_URL
+      }], 0, 'loop', true);
+      console.log('[KeepAlive] replaceQueue remote OK (1s)');
+      return true;
+    } catch (e) {
+      console.warn('[KeepAlive] replaceQueue remote failed:', e);
+    }
+
+    return false;
   }
 
   async function stopNativeKeepAlive() {
@@ -177,7 +206,7 @@
   // ========== CSS ==========
 
   function getCSS() {
-    return '.roche-plugin-keepalive{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#e0e0e0;background:#1a1a2e;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0;box-sizing:border-box}.roche-plugin-keepalive *,.roche-plugin-keepalive *::before,.roche-plugin-keepalive *::after{box-sizing:border-box}.ka-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#16213e;border-bottom:1px solid #0f3460;position:sticky;top:0;z-index:10}.ka-title{margin:0;font-size:17px;font-weight:600}.ka-close{background:none;border:1px solid #0f3460;color:#e0e0e0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:14px;line-height:1}.ka-close:hover{background:#0f3460}.ka-body{padding:16px}.ka-card{background:#16213e;border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid #0f3460}.ka-card h3{margin:0 0 6px;font-size:15px;color:#4ecca3}.ka-card p{margin:0 0 8px;font-size:13px;color:#999;line-height:1.5}.ka-status{display:flex;align-items:center;gap:10px;margin-bottom:16px}.ka-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}.ka-dot-on{background:#4ecca3;box-shadow:0 0 6px #4ecca3}.ka-dot-off{background:#555}.ka-status-text{font-size:15px;font-weight:500}.ka-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#16213e;border-radius:10px;border:1px solid #0f3460;margin-bottom:12px}.ka-toggle-label{font-size:15px;font-weight:500}.ka-toggle{position:relative;width:48px;height:26px;cursor:pointer}.ka-toggle input{opacity:0;width:0;height:0}.ka-toggle-slider{position:absolute;inset:0;background:#333;border-radius:13px;transition:background .3s}.ka-toggle-slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#e0e0e0;border-radius:50%;transition:transform .3s}.ka-toggle input:checked+.ka-toggle-slider{background:#4ecca3}.ka-toggle input:checked+.ka-toggle-slider::before{transform:translateX(22px)}.ka-notice{background:#2c2e20;border:1px solid #4ecca3;border-radius:8px;padding:10px;font-size:12px;color:#999;line-height:1.5;margin-bottom:12px}.ka-warn{background:#3d201d;border-color:#e74c3c}.ka-btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:500;transition:background .2s}.ka-btn-primary{background:#4ecca3;color:#1a1a2e}.ka-btn-primary:hover{background:#3db88d}.ka-btn-danger{background:#c0392b;color:#e0e0e0}.ka-btn-danger:hover{background:#a93226}.ka-actions{display:flex;gap:8px;margin-top:12px}.ka-info-item{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #0f3460;font-size:12px}.ka-info-item:last-child{border-bottom:none}.ka-info-key{color:#666}.ka-info-val{color:#e0e0e0;font-weight:500}.ka-badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:600;margin-left:4px}.ka-badge-apk{background:#4ecca3;color:#1a1a2e}.ka-badge-web{background:#3498db;color:#fff}.ka-method{font-size:14px;font-weight:600;margin-bottom:4px}';
+    return '.roche-plugin-keepalive{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#e0e0e0;background:#1a1a2e;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0;box-sizing:border-box}.roche-plugin-keepalive *,.roche-plugin-keepalive *::before,.roche-plugin-keepalive *::after{box-sizing:border-box}.ka-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#16213e;border-bottom:1px solid #0f3460;position:sticky;top:0;z-index:10}.ka-title{margin:0;font-size:17px;font-weight:600}.ka-close{background:none;border:1px solid #0f3460;color:#e0e0e0;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:14px;line-height:1}.ka-close:hover{background:#0f3460}.ka-body{padding:16px}.ka-card{background:#16213e;border-radius:10px;padding:16px;margin-bottom:12px;border:1px solid #0f3460}.ka-card h3{margin:0 0 6px;font-size:15px;color:#4ecca3}.ka-card p{margin:0 0 8px;font-size:13px;color:#999;line-height:1.5}.ka-status{display:flex;align-items:center;gap:10px;margin-bottom:16px}.ka-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}.ka-dot-on{background:#4ecca3;box-shadow:0 0 6px #4ecca3}.ka-dot-off{background:#555}.ka-status-text{font-size:15px;font-weight:500}.ka-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#16213e;border-radius:10px;border:1px solid #0f3460;margin-bottom:12px}.ka-toggle-label{font-size:15px;font-weight:500}.ka-toggle{position:relative;width:48px;height:26px;cursor:pointer}.ka-toggle input{opacity:0;width:0;height:0}.ka-toggle-slider{position:absolute;inset:0;background:#333;border-radius:13px;transition:background .3s}.ka-toggle-slider::before{content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#e0e0e0;border-radius:50%;transition:transform .3s}.ka-toggle input:checked+.ka-toggle-slider{background:#4ecca3}.ka-toggle input:checked+.ka-toggle-slider::before{transform:translateX(22px)}.ka-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600;vertical-align:middle}.ka-badge-apk{background:#0f3460;color:#4ecca3}.ka-badge-web{background:#333;color:#e0e0e0}.ka-method{font-size:16px;font-weight:600;margin-bottom:4px}.ka-actions{display:flex;gap:10px;margin-bottom:12px}.ka-btn{flex:1;padding:12px;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s}.ka-btn:active{opacity:.7}.ka-btn-primary{background:#4ecca3;color:#1a1a2e}.ka-btn-danger{background:#e74c3c;color:#fff}.ka-info-item{display:flex;justify-content:space-between;padding:6px 0;font-size:13px;border-bottom:1px solid #0f3460}.ka-info-item:last-child{border-bottom:none}.ka-info-key{color:#999}.ka-info-val{color:#e0e0e0}.ka-notice{padding:10px 14px;border-radius:8px;font-size:12px;line-height:1.5;background:#0f3460;color:#ccc}.ka-warn{background:#3e2723;color:#ffab91}';
   }
 
   // ========== Render ==========
@@ -301,7 +330,7 @@
   window.RochePlugin.register({
     id: 'keepalive',
     name: 'Keep Alive',
-    version: '2.5.0',
+    version: '2.6.0',
     apps: [
       {
         id: 'keepalive-home',
@@ -309,15 +338,16 @@
         icon: 'battery_charging_full',
         iconImage: '',
         async mount(container, roche) {
+          if (!roche || !roche.storage) {
+            container.innerHTML = '<p>Roche API not available.</p>';
+            return;
+          }
           renderMain(container, roche);
-        },
-        async unmount(container, roche) {
-          container.replaceChildren();
         }
       }
     ]
   });
 
-  console.log('[KeepAlive] v2.5.0 | ' + (hasNativeAudio() ? 'Native Service' : 'Web Audio'));
+  console.log('[KeepAlive] v2.6.0 | ' + (hasNativeAudio() ? 'Native Service' : 'Web Audio'));
 
 })();
