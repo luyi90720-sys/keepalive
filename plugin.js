@@ -330,6 +330,47 @@
       h += '<div class="ka-info-item"><span class="ka-info-key">Status</span><span class="ka-info-val">' + (enabled ? 'Running' : 'Stopped') + '</span></div>';
       h += '</div>';
 
+      // Diagnostics - 详细诊断 Capacitor 和插件状态
+      h += '<div class="ka-card"><h3>Diagnostics</h3>';
+      var cap = null;
+      try { cap = window.Capacitor; } catch (e) {}
+      var capPlatform = 'N/A';
+      var capIsNative = false;
+      var bgPlugin = null;
+      var bridge = null;
+      var bridgeReady = false;
+      var bridgeVer = 'N/A';
+      try {
+        if (cap) {
+          capPlatform = typeof cap.getPlatform === 'function' ? cap.getPlatform() : (cap.platform || 'unknown');
+          capIsNative = typeof cap.isNativePlatform === 'function' ? cap.isNativePlatform() : false;
+          bgPlugin = cap.Plugins ? (cap.Plugins.BackgroundAudio || null) : null;
+        }
+      } catch (e) {}
+      try {
+        bridge = window.nativeAudioBridge;
+        if (bridge) {
+          bridgeReady = !!bridge.__ready;
+          bridgeVer = bridge.__version || 'unknown';
+        }
+      } catch (e) {}
+      h += '<div class="ka-info-item"><span class="ka-info-key">window.Capacitor</span><span class="ka-info-val" style="color:' + (cap ? '#4ecca3' : '#e94560') + '">' + (cap ? 'EXISTS' : 'MISSING') + '</span></div>';
+      h += '<div class="ka-info-item"><span class="ka-info-key">Capacitor.platform</span><span class="ka-info-val">' + capPlatform + '</span></div>';
+      h += '<div class="ka-info-item"><span class="ka-info-key">isNativePlatform</span><span class="ka-info-val" style="color:' + (capIsNative ? '#4ecca3' : '#e94560') + '">' + (capIsNative ? 'true' : 'false') + '</span></div>';
+      h += '<div class="ka-info-item"><span class="ka-info-key">Plugins.BackgroundAudio</span><span class="ka-info-val" style="color:' + (bgPlugin ? '#4ecca3' : '#e94560') + '">' + (bgPlugin ? 'EXISTS' : 'MISSING') + '</span></div>';
+      h += '<div class="ka-info-item"><span class="ka-info-key">nativeAudioBridge</span><span class="ka-info-val" style="color:' + (bridge ? '#4ecca3' : '#e94560') + '">' + (bridge ? 'EXISTS' : 'MISSING') + '</span></div>';
+      h += '<div class="ka-info-item"><span class="ka-info-key">bridge.__ready</span><span class="ka-info-val" style="color:' + (bridgeReady ? '#4ecca3' : '#e94560') + '">' + (bridgeReady ? 'true' : 'false') + '</span></div>';
+      h += '<div class="ka-info-item"><span class="ka-info-key">bridge.__version</span><span class="ka-info-val">' + bridgeVer + '</span></div>';
+      if (!cap) {
+        h += '<p style="color:#e94560;margin-top:8px">Capacitor 不存在！你可能在浏览器中运行，不是在 APK 中。请安装 APK。</p>';
+      } else if (capIsNative && !bgPlugin) {
+        h += '<p style="color:#e94560;margin-top:8px">BackgroundAudio 插件未注册！请更新 APK（registerPlugin 顺序修复）。</p>';
+      } else if (bridge && !bridgeReady) {
+        h += '<p style="color:#e94560;margin-top:8px">桥接存在但未就绪。点击 Retry Init 按钮重试。</p>';
+      }
+      h += '<button class="ka-btn ka-btn-primary" id="ka-retry" style="margin-top:8px">Retry Init</button>';
+      h += '</div>';
+
       // Notice
       if (!nativeAudio) {
         h += '<div class="ka-notice ka-warn">Web 保活不如原生可靠。请使用 APK 获得原生保活。</div>';
@@ -384,6 +425,21 @@
           stopKeepAlive().then(function () {
             storageSet(roche, STORAGE_KEY, false);
             roche.ui.toast('Keep alive stopped');
+            renderMain(container, roche);
+          });
+        };
+      }
+
+      var retryBtn = $id('ka-retry');
+      if (retryBtn) {
+        retryBtn.onclick = function () {
+          roche.ui.toast('Retrying native audio init...');
+          waitForNativeAudio(8000).then(function (ready) {
+            if (ready) {
+              roche.ui.toast('Native audio ready!');
+            } else {
+              roche.ui.toast('Native audio still not available. Check Diagnostics.');
+            }
             renderMain(container, roche);
           });
         };
