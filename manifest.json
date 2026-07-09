@@ -1,8 +1,8 @@
 {
   "id": "keepalive",
   "name": "Keep Alive",
-  "version": "2.6.0",
-  "description": "Background keep-alive plugin for Roche. Uses native foreground service when APK is available, falls back to silent Web Audio loop otherwise.",
+  "version": "3.0.0",
+  "description": "Background keep-alive plugin v3.0. Fully local - uses APK built-in silence audio (no VPN/network needed). Native foreground service when APK available, Web Audio fallback otherwise.",
   "author": "Roche Community",
   "entry": "plugin.js",
   "hash": "",
